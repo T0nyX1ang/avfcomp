@@ -1,3 +1,7 @@
+# pylint: skip-file
+# type: ignore
+
+
 from io import BytesIO
 
 from js import document, Uint8Array, File, URL
@@ -68,16 +72,10 @@ def getcomp(event):
         output_div.innerText = "文件已经被压缩, 请重试"
         return
 
-    cvf = AVFComp()
-
     original_size = len(ps.file)
 
-    data_io = BytesIO(ps.file)
-    cvf.read_data(data_io)
-    comp_data = BytesIO()
-    with cvf.handler(comp_data, "wb") as fout:
-        cvf.write_data(fout)
-    cvf_compressed = comp_data.getvalue()
+    cvf = AVFComp()
+    cvf_compressed = cvf.compress(ps.file)
 
     compressed_size = len(cvf_compressed)
 
@@ -104,11 +102,7 @@ def getdecomp(event):
         return
 
     cvf = AVFDecomp()
-    with cvf.handler(BytesIO(ps.file), "rb") as fin:
-        cvf.read_data(fin)
-    decomp_data = BytesIO()
-    cvf.write_data(decomp_data)
-    cvf_decompressed = decomp_data.getvalue()
+    cvf_decompressed = cvf.decompress(ps.file)
 
     ps.file = cvf_decompressed
     ps.filename = ps.filename.replace(".cvf", ".avf")
